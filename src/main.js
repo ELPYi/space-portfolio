@@ -76,9 +76,19 @@ try {
   console.error('[World] Failed to initialise world objects:', err);
 }
 
-// Dyson shockwave impulse for debris fly-past
+// Dyson shockwave impulse for debris fly-past + player pushback
 dysonSphere && (dysonSphere.onShockwave = (pos) => {
-  spaceDebris.applyShockwave(pos, 140, 2200);
+  const playerPos = controls.getPosition();
+
+  const dir = new THREE.Vector3().subVectors(playerPos, pos);
+  const dist = dir.length();
+  if (dist > 1) {
+    dir.normalize();
+    const radius = 2200;
+    const falloff = Math.max(0, 1 - (dist / radius));
+    const impulse = 0.9 * (0.35 + falloff * falloff);
+    controls.applyImpulse(dir, impulse);
+  }
 });
 const spaceship = new Spaceship(sm.scene);
 const controls = new ShipControls(sm.camera, spaceship.group, spaceship.mesh, sm.renderer.domElement);
@@ -178,6 +188,15 @@ const navMenu = new NavMenu(PROJECTS, (project) => {
   });
 });
 navMenu.onSpawn = warpToSpawn;
+navMenu.hamburger?.addEventListener('click', () => {
+  if (!navMenu.isOpen && document.pointerLockElement) {
+    document.exitPointerLock();
+  }
+  // The NavMenu toggles open/close on click; hide the hint once opened.
+  setTimeout(() => {
+    if (navMenu.isOpen) dismissWarpHint();
+  }, 0);
+});
 
 // Controls hint elements
 const controlsHintEl = document.getElementById('controls-hint');
@@ -250,48 +269,113 @@ const hud = new HUD(() => {
 
   if (isMobile) {
     introAnimation.start(() => {
+      controls.syncToCamera(sm.camera);
       controls.lock();
+      showWarpHint();
       touchControls.show();
       navMenu.show();
-      showControlsHint();
     });
   } else {
     introAnimation.start(() => {
+      controls.syncToCamera(sm.camera);
       controls.lock();
+      showWarpHint();
       navMenu.show();
-      showControlsHint();
       runPortfolioDysonSequence();
     });
   }
 });
 
+const hudWarpHint = document.getElementById('hud-warp-hint');
+let _warpHintDismissed = false;
+function showWarpHint() {
+  if (!hudWarpHint || _warpHintDismissed) return;
+  hudWarpHint.classList.remove('hidden');
+}
+
+function dismissWarpHint() {
+  if (!hudWarpHint) return;
+  _warpHintDismissed = true;
+  hudWarpHint.classList.add('hidden');
+}
+
+if (isMobile) {
+  const warning = document.getElementById('mobile-warning');
+  const okBtn = document.getElementById('mobile-warning-ok');
+  if (warning && okBtn) {
+    warning.classList.remove('hidden');
+    okBtn.addEventListener('click', () => {
+      warning.classList.add('hidden');
+    });
+  }
+}
+
 function runPortfolioDysonSequence() {
   if (!dysonSphere || networkManager.connected || _dysonIntroActive) return;
   _dysonIntroActive = true;
 
-  // Quick construction + startup sequence
+  // Cinematic construction + startup sequence
+  const prevTimings = {
+    slotInSpeed: dysonSphere._slotInSpeed,
+    powerUpDuration: dysonSphere._powerUpDuration,
+    ringPowerUpDuration: dysonSphere._ringPowerUpDuration,
+  };
+  const restoreTimings = () => {
+    if (!dysonSphere) return;
+    dysonSphere._slotInSpeed = prevTimings.slotInSpeed;
+    dysonSphere._powerUpDuration = prevTimings.powerUpDuration;
+    dysonSphere._ringPowerUpDuration = prevTimings.ringPowerUpDuration;
+  };
+
+  // Slow, cinematic intro timings
+  dysonSphere._slotInSpeed = 2.2;
+  dysonSphere._powerUpDuration = 7.0;
+  dysonSphere._ringPowerUpDuration = 2.6;
+
   dysonSphere.reset?.();
   dysonSphere.syncPanels?.(0);
   soundManager.startDysonConstruct();
 
   const total = dysonSphere.totalPanels || 0;
-  const buildDuration = 3.0; // seconds for full construction
+  const buildDuration = 8.5; // seconds for full construction
+  const preLockHold = 1.6;   // pause before lockDown for a cinematic beat
   const startTime = performance.now();
+  let lockAt = null;
+
+  const easeInOutCubic = (x) => (
+    x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2
+  );
 
   const tick = () => {
-    if (networkManager.connected) { _dysonIntroActive = false; return; }
-    const t = Math.min((performance.now() - startTime) / 1000 / buildDuration, 1);
+    if (networkManager.connected) {
+      soundManager.stopDysonConstruct();
+      restoreTimings();
+      _dysonIntroActive = false;
+      return;
+    }
+    const now = performance.now();
+    const tRaw = Math.min((now - startTime) / 1000 / buildDuration, 1);
+    const t = easeInOutCubic(tRaw);
     const target = Math.floor(t * total);
     for (let i = dysonSphere.visiblePanels; i < target; i++) {
       dysonSphere.showPanel(i);
     }
-    if (t < 1) {
+    if (tRaw < 1) {
       requestAnimationFrame(tick);
     } else {
-      dysonSphere.lockDown?.();
-      soundManager.stopDysonConstruct();
-      soundManager.playDysonActivate();
-      _dysonIntroActive = false;
+      if (lockAt === null) {
+        lockAt = now + preLockHold * 1000;
+      }
+      if (now >= lockAt) {
+        dysonSphere.lockDown?.();
+        soundManager.stopDysonConstruct();
+        soundManager.playDysonActivate();
+        _dysonIntroActive = false;
+        const restoreDelay = ((dysonSphere._powerUpDuration ?? 4) * 1000) + 500;
+        setTimeout(restoreTimings, restoreDelay);
+      } else {
+        requestAnimationFrame(tick);
+      }
     }
   };
 
@@ -740,11 +824,24 @@ networkManager.onServerClose = () => {
 
 // Pointer lock change — show/hide crosshair (desktop only)
 if (!isMobile) {
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'KeyM' && !introAnimation.isActive && !warpAnimation.isActive && !entryAnimation.isActive) {
+      if (navMenu.isOpen) {
+        navMenu.close();
+      } else {
+        if (document.pointerLockElement) document.exitPointerLock();
+        navMenu.open();
+      }
+      dismissWarpHint();
+    }
+  });
+
   document.addEventListener('pointerlockchange', () => {
     const locked = document.pointerLockElement === sm.renderer.domElement;
     hud.showCrosshair(locked);
     if (!locked) {
       leadIndicatorEl.style.display = 'none';
+      dismissWarpHint();
       if (!introAnimation.isActive && !warpAnimation.isActive && !entryAnimation.isActive) {
         navMenu.open();
       }
@@ -790,10 +887,6 @@ function animate() {
   // Update intro, entry, warp animation, or normal controls
   if (introAnimation.isActive) {
     introAnimation.update(delta);
-    if (introAnimation.allowControl) {
-      if (!controls.isLocked) controls.lock();
-      if (controls.isLocked) controls.update(delta, false);
-    }
   } else if (warpAnimation.isActive) {
     warpAnimation.update(delta);
   } else if (entryAnimation.isActive) {
@@ -803,8 +896,9 @@ function animate() {
     starfield.update(delta, controls.getPosition());
 
     // Gatling system — pass held-mouse state so it manages spin + fire internally
+    const muzzleWorld = spaceship.getMuzzleWorldPosition();
     const { fired: gatlingFired, hit: laserHit } = laserSystem.update(
-      delta, controls._mouseHeld, sm.camera, controls.getPosition()
+      delta, controls._mouseHeld, sm.camera, controls.getPosition(), muzzleWorld
     );
     if (gatlingFired) soundManager.playGatlingShot();
     if (laserHit) {

@@ -27,7 +27,6 @@ export class IntroAnimation {
     this._active  = false;
     this._elapsed = 0;
     this._onComplete = null;
-    this._allowControlAt = 0.55; // allow player control midway through intro
     this._controlEnabled = false;
 
     // ── Phase 0: fly-in ──────────────────────────────────────────────────────
@@ -52,7 +51,6 @@ export class IntroAnimation {
   }
 
   get isActive() { return this._active; }
-  get allowControl() { return this._controlEnabled; }
 
   start(onComplete) {
     this._active     = true;
@@ -147,10 +145,6 @@ export class IntroAnimation {
         lookBlend
       );
       this.camera.lookAt(lookTarget);
-    }
-
-    if (!this._controlEnabled && rawT >= this._allowControlAt) {
-      this._controlEnabled = true;
     }
 
     if (rawT >= 1) {

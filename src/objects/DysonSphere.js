@@ -24,6 +24,10 @@ export class DysonSphere {
   constructor(scene) {
     this._scene = scene;
     this._time  = 0;
+    // Tunable animation timings (can be adjusted for cinematic sequences)
+    this._slotInSpeed = 4;        // higher = faster panel slot-in
+    this._powerUpDuration = 4;    // seconds
+    this._ringPowerUpDuration = 1.4; // seconds
 
     this.group = new THREE.Group();
     this.group.position.set(x, y, z);
@@ -464,7 +468,8 @@ export class DysonSphere {
     // Orbital rings — spin speeds ramp up during activation (power-up)
     let ringSpinMul = 0.25;
     if (this._poweredUp) {
-      const t = Math.min(this._powerUpTime / 1.4, 1);
+      const ringDur = this._ringPowerUpDuration ?? 1.4;
+      const t = Math.min(this._powerUpTime / ringDur, 1);
       ringSpinMul = 1 + t * 19.0; // ramps 1.0 → 20.0 during activation
     } else if (!this._lockedDown) {
       const progress = this.constructionProgress;
@@ -482,7 +487,8 @@ export class DysonSphere {
     // Panel slot-in animation
     for (const panel of this.panels) {
       if (!panel.userData.slotting) continue;
-      panel.userData.slotT += delta * 4;
+      const slotSpeed = this._slotInSpeed ?? 4;
+      panel.userData.slotT += delta * slotSpeed;
       const t = Math.min(panel.userData.slotT, 1);
       const eased = 1 - Math.pow(1 - t, 3);
       panel.scale.setScalar(eased);
@@ -545,7 +551,8 @@ export class DysonSphere {
 
     if (this._poweredUp) {
       this._powerUpTime += delta;
-      const pt   = Math.min(this._powerUpTime / 4, 1);
+      const powerUpDur = this._powerUpDuration ?? 4;
+      const pt   = Math.min(this._powerUpTime / powerUpDur, 1);
       const ease = pt * pt * (3 - 2 * pt);
 
       // Spin the entire sphere group (panels + scaffold) for a majestic powered look
@@ -568,7 +575,8 @@ export class DysonSphere {
 
       // Transition inner sphere → opaque black so gaps appear as crisp dark voids
       // against the bright gold panels, making the triangle pattern pop visually
-      const blackFade = Math.min(this._powerUpTime / 3, 1);
+      const blackDur = Math.max((this._powerUpDuration ?? 4) * 0.75, 0.01);
+      const blackFade = Math.min(this._powerUpTime / blackDur, 1);
       this._innerGlowMat.emissive.setRGB(
         (1 - blackFade) * (0xff / 255),
         (1 - blackFade) * (0x77 / 255),

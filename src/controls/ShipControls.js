@@ -173,6 +173,11 @@ export class ShipControls {
     this._touchBoosting = val;
   }
 
+  setTouchFiring(val) {
+    this._mouseHeld = !!val;
+    if (this._mouseHeld && this.onShoot) this.onShoot();
+  }
+
   update(delta, updateCamera = true) {
     if (!this.enabled) return;
 
@@ -294,6 +299,21 @@ export class ShipControls {
       this.velocity.addScaledVector(normal, -2 * dot);
       this.velocity.multiplyScalar(0.6);
     }
+  }
+
+  syncToCamera(camera) {
+    if (!camera) return;
+    this.orientation.copy(camera.quaternion);
+    this.orientation.normalize();
+    this._camTargetPos.copy(camera.position);
+    this._camLookTarget.copy(camera.position);
+    this._currentFov = camera.fov;
+  }
+
+  /** Apply an external impulse (e.g. shockwave) in world space. */
+  applyImpulse(direction, magnitude) {
+    if (!direction || magnitude <= 0) return;
+    this.velocity.addScaledVector(direction, magnitude);
   }
 
   /** Returns current directional input for ship sway animation */

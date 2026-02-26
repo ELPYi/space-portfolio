@@ -253,6 +253,7 @@ export class Spaceship {
     const muzzle = new THREE.Mesh(new THREE.CircleGeometry(0.06, 8), this._muzzleFlashMat);
     muzzle.position.set(0, 0, -0.28);
     this.gatlingBarrels.add(muzzle);
+    this._muzzle = muzzle;
 
     this.mesh.add(this.gatlingBarrels);
 
@@ -286,6 +287,11 @@ export class Spaceship {
     } else {
       this._muzzleFlashMat.opacity *= 0.55; // quick fade
     }
+  }
+
+  /** World-space muzzle position for the gatling gun. */
+  getMuzzleWorldPosition(target = new THREE.Vector3()) {
+    return this._muzzle.getWorldPosition(target);
   }
 
   update(delta, speed, boosting, input) {

@@ -6,10 +6,11 @@ export class LaserSystem {
     this.group = new THREE.Group();
     scene.add(this.group);
 
-    this._poolSize    = 40;
-    this._bolts       = [];
-    this._boltSpeed   = 300;
+    this._poolSize     = 40;
+    this._bolts        = [];
+    this._boltSpeed    = 300;
     this._boltLifetime = 1.5;
+    this._boltLength   = 20;
 
     // ── Gatling spin state ────────────────────────────────────────────────────
     this._spinRate     = 0;  // 0–1  (0 = stopped, 1 = full speed)
@@ -18,7 +19,9 @@ export class LaserSystem {
 
     // Laser bolt: long thin beam so consecutive shots visually connect
     // At full spin (cooldown=0.04s): bolt length 20 > speed*cooldown (12) → overlap, no gaps
-    const geometry = new THREE.BoxGeometry(0.06, 0.06, 20);
+    const geometry = new THREE.BoxGeometry(0.06, 0.06, this._boltLength);
+    // Shift so the bolt starts at the origin and extends forward (no beam behind the muzzle).
+    geometry.translate(0, 0, -this._boltLength / 2);
     const material = new THREE.MeshBasicMaterial({ color: 0xff2200 });
 
     for (let i = 0; i < this._poolSize; i++) {
@@ -49,9 +52,10 @@ export class LaserSystem {
    * @param {boolean} mouseHeld - true while left mouse button is held
    * @param {THREE.Camera} camera
    * @param {THREE.Vector3} shipPosition
+   * @param {THREE.Vector3=} muzzleWorldPos
    * @returns {{ fired: boolean, hit: object|null }}
    */
-  update(delta, mouseHeld, camera, shipPosition) {
+  update(delta, mouseHeld, camera, shipPosition, muzzleWorldPos) {
     // ── Spin up / down ────────────────────────────────────────────────────────
     if (mouseHeld) {
       this._spinRate = Math.min(1, this._spinRate + delta * 1.4); // ~0.7 s to full
@@ -70,7 +74,7 @@ export class LaserSystem {
       // Continuous fire achieved at ~0.8 spin (bolt length 20 > speed*cooldown 18.9)
       const cooldown = 0.40 * Math.pow(0.1, this._spinRate);
       this._cooldownTimer = cooldown;
-      fired = this._spawnBolt(camera, shipPosition, this._spinRate);
+      fired = this._spawnBolt(camera, shipPosition, muzzleWorldPos, this._spinRate);
     }
 
     // ── Move bolts + check hits ───────────────────────────────────────────────
@@ -100,13 +104,15 @@ export class LaserSystem {
     return { fired, hit: hitResult };
   }
 
-  _spawnBolt(camera, shipPosition, spinRate = 1) {
+  _spawnBolt(camera, shipPosition, muzzleWorldPos, spinRate = 1) {
     const bolt = this._bolts.find(b => !b.active);
     if (!bolt) return false;
 
     const forward   = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
     const aimTarget = camera.position.clone().addScaledVector(forward, 1000);
-    const spawnPos  = shipPosition.clone().addScaledVector(forward, 3);
+    const spawnPos  = muzzleWorldPos
+      ? muzzleWorldPos.clone().addScaledVector(forward, 0.15)
+      : shipPosition.clone().addScaledVector(forward, 3);
     const fireDir   = aimTarget.clone().sub(spawnPos).normalize();
 
     // Random spread — wider when just spinning up, tighter at full spin

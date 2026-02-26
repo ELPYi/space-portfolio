@@ -74,16 +74,18 @@ export class TouchControls {
     this.fireBtn.addEventListener('touchstart', (e) => {
       e.preventDefault();
       this.fireBtn.classList.add('active');
-      if (this.shipControls.onShoot) this.shipControls.onShoot();
+      this.shipControls.setTouchFiring(true);
     }, { passive: false });
 
     this.fireBtn.addEventListener('touchend', (e) => {
       e.preventDefault();
       this.fireBtn.classList.remove('active');
+      this.shipControls.setTouchFiring(false);
     }, { passive: false });
 
     this.fireBtn.addEventListener('touchcancel', () => {
       this.fireBtn.classList.remove('active');
+      this.shipControls.setTouchFiring(false);
     });
   }
 

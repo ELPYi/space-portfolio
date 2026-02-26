@@ -5,6 +5,10 @@ export class HUD {
     this.launchBtn = document.getElementById('launch-btn');
 
     this.launchBtn.addEventListener('click', () => {
+      const docEl = document.documentElement;
+      if (docEl && docEl.requestFullscreen) {
+        docEl.requestFullscreen().catch(() => {});
+      }
       this.introScreen.classList.add('hidden');
       onLaunch();
     });

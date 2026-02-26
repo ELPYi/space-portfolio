@@ -1,222 +1,630 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Spaceship Portfolio</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
+
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
   <div id="canvas-container"></div>
+
   <div id="entry-flash"></div>
 
-  <!-- Lost player side banner — slides in from the right, player keeps control -->
+
+
+  <!-- Lost player side banner - slides in from the right, player keeps control -->
+
   <div id="lost-banner">
+
     <p id="lost-banner-title">ARE YOU LOST?</p>
+
     <p id="lost-banner-hint"></p>
+
     <div id="lost-banner-buttons">
+
       <button id="lost-yes"><span class="lost-key">Y</span> WARP TO SPAWN</button>
+
       <button id="lost-no"><span class="lost-key">N</span> I'M FINE</button>
+
     </div>
+
   </div>
+
+
 
   <div id="crosshair">+</div>
-  <!-- Lead indicator — projects to predicted intercept point of nearest enemy -->
+
+  <!-- Lead indicator - projects to predicted intercept point of nearest enemy -->
+
   <div id="lead-indicator"></div>
 
+
+
   <!-- Nav menu -->
+
   <button id="nav-hamburger" aria-label="Navigation menu">
-    <span></span><span></span><span></span>
+
+    <span class="nav-hamburger-text">M</span>
+
   </button>
+
   <div id="nav-panel">
+
     <div id="nav-panel-inner">
+
       <h3 class="nav-heading">WARP TO PLANET</h3>
+
       <div id="nav-planet-list"></div>
+
+      <div class="nav-controls">
+        <div class="nav-controls-title">CONTROLS</div>
+        <div class="nav-controls-grid">
+          <div class="nav-controls-block">
+            <div class="nav-controls-label">DESKTOP</div>
+            <ul class="nav-controls-list">
+              <li>WASD or Arrow Keys to fly</li>
+              <li>Mouse to look and aim</li>
+              <li>Hold Left Click to shoot</li>
+              <li>Shift to boost</li>
+              <li>Right Click to barrel roll</li>
+              <li>Press M to open the menu</li>
+            </ul>
+          </div>
+          <div class="nav-controls-block nav-controls-mobile-only">
+            <div class="nav-controls-label">MOBILE</div>
+            <ul class="nav-controls-list">
+              <li>Left joystick to fly</li>
+              <li>Drag to look and aim</li>
+              <li>Tap Boost to speed up</li>
+              <li>Tap Fire to shoot</li>
+              <li>Tap the M menu button</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
     </div>
+
   </div>
+
+
 
   <div id="intro-screen">
-    <h1 class="neon-title">STELLAR PORTFOLIO</h1>
-    <p class="intro-subtitle">Navigate through space to discover my projects</p>
-    <p class="intro-controls intro-controls-desktop">Left Click to shoot &bull; WASD to fly &bull; Mouse to look &bull; Shift to boost</p>
-    <p class="intro-controls intro-controls-mobile">Joystick to fly &bull; Drag to look &bull; Tap boost</p>
-    <button id="launch-btn">LAUNCH</button>
+    <div id="mobile-warning" class="mobile-warning hidden" role="dialog" aria-live="polite">
+      <div class="mobile-warning-card">
+        <div class="mobile-warning-title">Heads up</div>
+        <p>
+          This portfolio is most enjoyable on desktop. Mobile works, but some controls can feel cramped.
+        </p>
+        <button id="mobile-warning-ok" class="btn-secondary">I UNDERSTAND</button>
+      </div>
+    </div>
+    <div class="landing">
+      <section class="landing-hero">
+        <div class="hero-copy">
+          <div class="hero-eyebrow">Ethan Liam - AI-forward Developer</div>
+          <h1 class="hero-title">Modern, playful engineering for real-world impact</h1>
+          <p class="hero-subtitle">
+            Hi, I'm Ethan, a Queensland University of Technology Computer Science graduate. I like building interactive products and
+            exploring how AI can accelerate practical solutions across different domains.
+          </p>
+
+          <div class="hero-links">
+            <a href="mailto:ethanliam7@gmail.com">ethanliam7@gmail.com</a>
+            <span class="dot">and</span>
+            <a href="https://github.com/ELPYi" target="_blank" rel="noopener">GitHub</a>
+          </div>
+
+          <div class="controls-card">
+            <h3>How To Explore</h3>
+            <p>Launch to enter the interactive portfolio. You can fly to planets to open projects. Multiplayer is optional.</p>
+            <div class="controls-grid">
+              <div class="controls-block intro-controls-desktop">
+                <div class="controls-label">Desktop Controls</div>
+                <ul class="controls-list">
+                  <li>WASD or Arrow Keys to fly</li>
+                  <li>Mouse to look and aim</li>
+                  <li>Hold Left Click to shoot</li>
+                  <li>Shift to boost</li>
+                  <li>Right Click to barrel roll</li>
+                  <li>Press M to open the menu</li>
+                </ul>
+              </div>
+              <div class="controls-block intro-controls-mobile">
+                <div class="controls-label">Mobile Controls</div>
+                <ul class="controls-list">
+                  <li>Left joystick to fly</li>
+                  <li>Drag to look and aim</li>
+                  <li>Tap Boost to speed up</li>
+                  <li>Tap Fire to shoot</li>
+                  <li>Tap the M menu button</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-cta">
+            <button id="launch-btn" class="btn-primary">LAUNCH PORTFOLIO</button>
+            <div class="cta-bubble" aria-hidden="true">
+              do you want to play a game?
+              <span class="cta-bubble-tail"></span>
+            </div>
+            <a class="btn-secondary" href="#landing-projects">VIEW PROJECTS</a>
+            <a class="btn-ghost" href="https://docs.google.com/document/d/1_dUsPwCqiQoxcT4Ljvz9XczAPZUfCAVCauVxrAqo33A/edit?usp=sharing" target="_blank" rel="noopener">VIEW CV</a>
+          </div>
+        </div>
+
+        <div class="hero-panel">
+          <div class="panel-card">
+            <h3>AI-Enhanced Workflow</h3>
+            <p>
+              I use AI as a real-time collaborator for exploration, refactoring, testing, and rapid
+              prototyping.
+            </p>
+            <div class="pill-row">
+              <span class="pill">Claude Code</span>
+              <span class="pill">Codex</span>
+              <span class="pill">Espanso</span>
+              <span class="pill">Whisper Flow</span>
+            </div>
+          </div>
+          <div class="panel-card subtle">
+            <h3>What I'm Looking For</h3>
+            <p>
+              Roles where I can ship thoughtful projects and keep learning
+              across the stack.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="landing-projects" class="landing-section">
+        <div class="section-header">
+          <h2>Projects</h2>
+          <p>Hand-picked work that blends engineering depth with playful UX.</p>
+        </div>
+        <div class="project-grid">
+          <article class="project-card">
+            <h3>Tidal Predictor</h3>
+            <p>Desktop tide forecasting app using harmonic analysis with NOAA-standard constituents.</p>
+            <div class="project-tags">
+              <span>Python</span>
+              <span>Data Viz</span>
+              <span>Desktop</span>
+            </div>
+            <div class="project-links">
+              <a href="https://github.com/ELPYi/tidal-predictor" target="_blank" rel="noopener">GitHub</a>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <h3>Hydro Network Editor</h3>
+            <p>Visual editor for hydrological networks with drag-and-drop elements and property panels.</p>
+            <div class="project-tags">
+              <span>Python</span>
+              <span>PyQt6</span>
+              <span>GUI</span>
+            </div>
+            <div class="project-links">
+              <a href="https://github.com/ELPYi/hydro-network-editor" target="_blank" rel="noopener">GitHub</a>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <h3>Scattergories Online</h3>
+            <p>Real-time multiplayer party game with live voting, procedural audio, and custom lobbies.</p>
+            <div class="project-tags">
+              <span>React</span>
+              <span>Socket.IO</span>
+              <span>Game</span>
+            </div>
+            <div class="project-links">
+              <a href="https://github.com/ELPYi/scattergories" target="_blank" rel="noopener">GitHub</a>
+              <a href="https://scattergories.up.railway.app/" target="_blank" rel="noopener">Live</a>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <h3>Gamba!</h3>
+            <p>Multiplayer party game mixing auctions, crash betting, and slots with real-time rooms.</p>
+            <div class="project-tags">
+              <span>React</span>
+              <span>Node.js</span>
+              <span>Socket.IO</span>
+            </div>
+            <div class="project-links">
+              <a href="https://github.com/ELPYi/gamba" target="_blank" rel="noopener">GitHub</a>
+              <a href="https://gamba.up.railway.app/" target="_blank" rel="noopener">Live</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="landing-section">
+        <div class="section-header">
+          <h2>Lets Connect</h2>
+          <p>Open to roles where I can build, learn fast, and contribute to a strong product team.</p>
+        </div>
+        <div class="contact-card">
+          <div>
+            <div class="contact-label">Email</div>
+            <a href="mailto:ethanliam7@gmail.com">ethanliam7@gmail.com</a>
+          </div>
+          <div class="contact-actions">
+            <a class="btn-secondary" href="mailto:ethanliam7@gmail.com">CONTACT</a>
+            <a class="btn-ghost" href="https://docs.google.com/document/d/1_dUsPwCqiQoxcT4Ljvz9XczAPZUfCAVCauVxrAqo33A/edit?usp=sharing" target="_blank" rel="noopener">VIEW CV</a>
+          </div>
+        </div>
+      </section>
+    </div>
   </div>
+
 
   <div id="project-card" class="hidden">
+
     <h2 id="card-title"></h2>
+
     <p id="card-description"></p>
+
     <div id="card-tech"></div>
+
     <div id="card-links">
+
       <a id="card-github" href="#" target="_blank" rel="noopener">GitHub</a>
+
       <a id="card-live" href="#" target="_blank" rel="noopener">Live Demo</a>
+
     </div>
+
     <p class="card-hint">Fly closer to open project</p>
+
   </div>
+
+
 
   <!-- Touch controls (mobile only) -->
+
   <div id="joystick-zone">
+
     <div id="joystick-base">
+
       <div id="joystick-thumb"></div>
+
     </div>
+
   </div>
+
   <div id="look-zone"></div>
+
   <button id="boost-btn">BOOST</button>
+
   <button id="fire-btn">FIRE</button>
 
-  <!-- Standalone shield HUD — always visible after launch (top-left) -->
+
+
+  <!-- Standalone shield HUD - always visible after launch (top-left) -->
+
   <div id="hud-shield" class="hidden">
-    <span class="game-hud-shield-icon">◈</span>
+
+    <span class="game-hud-shield-icon"></span>
+
     <div id="game-hud-shield-bar">
+
       <div id="game-hud-shield-fill"></div>
+
     </div>
+
     <span id="game-hud-shield-pct">100</span>
+
   </div>
 
-  <!-- Game HUD — multiplayer mission status (top-right corner) -->
+
+
+  <!-- Game HUD - multiplayer mission status (top-right corner) -->
+
   <div id="game-hud" class="hidden">
+
     <div id="game-hud-phase">GATHERING</div>
-    <div id="game-hud-objective">Collect ore &amp; parts — deposit at the MOTHERSHIP</div>
+
+    <div id="game-hud-objective">Collect ore &amp; parts - deposit at the MOTHERSHIP</div>
+
     <div id="game-hud-progress-bar">
+
       <div id="game-hud-progress-fill"></div>
+
     </div>
+
     <div id="game-hud-panels">0 / 15 PANELS</div>
+
     <div id="game-hud-players">0 PILOTS ONLINE</div>
 
-    <!-- Cargo ship HP bar — visible during phase 1 (escort) -->
+
+
+    <!-- Cargo ship HP bar - visible during phase 1 (escort) -->
+
     <div id="game-hud-cargo-hp" class="hidden">
+
       <div class="game-hud-divider"></div>
+
       <div id="game-hud-cargo-hp-header">CARGO SHIP HULL</div>
+
       <div id="game-hud-cargo-hp-bar">
+
         <div id="game-hud-cargo-hp-fill"></div>
+
       </div>
+
     </div>
 
-    <!-- Boss health bar — only visible during phase 2 (boss) -->
+
+
+    <!-- Boss health bar - only visible during phase 2 (boss) -->
+
     <div id="game-hud-boss" class="hidden">
+
       <div class="game-hud-divider"></div>
-      <div id="game-hud-boss-header">⚠ GOLIATH</div>
+
+      <div id="game-hud-boss-header"> GOLIATH</div>
+
       <div id="game-hud-boss-bar">
+
         <div id="game-hud-boss-fill"></div>
+
       </div>
+
     </div>
 
-    <!-- Special laser energy — visible during phase 2 (boss) -->
+
+
+    <!-- Special laser energy - visible during phase 2 (boss) -->
+
     <div id="game-hud-special-energy" class="hidden">
-      <div id="game-hud-special-energy-header">⚡ SPECIAL [F]</div>
+
+      <div id="game-hud-special-energy-header"> SPECIAL [F]</div>
+
       <div id="game-hud-special-energy-bar">
+
         <div id="game-hud-special-energy-fill"></div>
+
       </div>
+
     </div>
+
+
 
     <div id="game-hud-countdown" class="hidden">
+
       <div class="game-hud-divider"></div>
-      <div id="game-hud-countdown-header">⏱ CONSTRUCTION WINDOW</div>
+
+      <div id="game-hud-countdown-header"> CONSTRUCTION WINDOW</div>
+
       <div id="game-hud-countdown-timer">1:00</div>
+
     </div>
+
+
 
     <div class="game-hud-divider"></div>
+
     <div id="game-hud-cargo-header">CARGO HOLD</div>
+
     <div class="game-hud-cargo-row">
+
       <span class="cargo-type-label ore">ORE</span>
+
       <div class="game-hud-mini-bar ore"><div id="game-hud-ore-fill" class="game-hud-mini-fill"></div></div>
+
       <span id="game-hud-ore-count" class="cargo-count">0</span>
+
     </div>
+
     <div class="game-hud-cargo-row">
+
       <span class="cargo-type-label parts">PARTS</span>
+
       <div class="game-hud-mini-bar parts"><div id="game-hud-parts-fill" class="game-hud-mini-fill"></div></div>
+
       <span id="game-hud-parts-count" class="cargo-count">0</span>
+
     </div>
+
   </div>
 
-  <!-- Beacon proximity hint — slides in from right like lost-banner -->
+
+
+  <!-- Beacon proximity hint - slides in from right like lost-banner -->
+
   <div id="join-beacon-hint">
-    <span class="beacon-hint-icon">◈</span>
+
+    <span class="beacon-hint-icon"></span>
+
     <div class="beacon-hint-text">
+
       <span class="beacon-hint-title">MULTIPLAYER GAME</span>
+
       <span class="beacon-hint-sub"><span class="lost-key">E</span> to join &bull; or ignore to explore portfolio</span>
+
     </div>
+
   </div>
+
+
 
   <!-- Join game modal -->
+
   <div id="join-game-ui" class="hidden">
+
     <div id="join-game-panel">
+
       <h2 class="join-title">JOIN MULTIPLAYER</h2>
+
       <p class="join-subtitle">Fly alongside other pilots &amp; build the Dyson sphere</p>
 
+
+
       <label class="join-label" for="join-callsign">CALLSIGN</label>
+
       <input id="join-callsign" class="join-input" type="text"
+
              maxlength="12" placeholder="PILOT" autocomplete="off" spellcheck="false" />
 
+
+
       <label class="join-label">SHIP COLOUR</label>
+
       <div id="join-color-picker"></div>
 
+
+
       <div class="join-buttons">
+
         <button id="join-btn">LAUNCH INTO GAME</button>
+
         <button id="join-cancel-btn">CANCEL</button>
+
       </div>
+
     </div>
+
   </div>
 
-  <!-- Objective banner — fixed screen-space, always visible during active objective -->
+
+
+  <!-- Objective banner - fixed screen-space, always visible during active objective -->
+
   <div id="objective-banner" class="hidden">
+
     <span id="objective-banner-text"></span>
+
   </div>
 
-  <!-- Wave / event warning banner — slides in from top -->
+
+
+  <!-- Wave / event warning banner - slides in from top -->
+
   <div id="wave-warning" class="hidden">
-    <span id="wave-warning-icon">⚠</span>
+
+    <span id="wave-warning-icon"></span>
+
     <span id="wave-warning-text">WAVE 1 INCOMING</span>
+
   </div>
 
-  <!-- Controls hint — fades in after launch, auto-hides -->
+
+
+  <!-- Controls hint - fades in after launch, auto-hides -->
+
   <div id="controls-hint" class="hidden">
+
     <span>WASD fly</span>
-    <span class="controls-sep">·</span>
+
+    <span class="controls-sep">and</span>
+
     <span>Mouse aim</span>
-    <span class="controls-sep">·</span>
+
+    <span class="controls-sep">and</span>
+
     <span>Shift boost</span>
-    <span class="controls-sep">·</span>
+
+    <span class="controls-sep">and</span>
+
     <span>Click shoot</span>
-    <span class="controls-sep">·</span>
+
+    <span class="controls-sep">and</span>
+
     <span>Right-click barrel roll</span>
+
   </div>
+
+  <!-- HUD bubble - hint about warp menu -->
+
+  <div id="hud-warp-hint" class="hud-hint hidden">
+    Not feeling the flying? Press M to open the menu and warp to planets.
+  </div>
+
+
 
   <!-- Mission countdown overlay -->
+
   <div id="mission-countdown" class="hidden">
+
     <div id="mission-countdown-number"></div>
+
     <div id="mission-countdown-text">MISSION START</div>
+
   </div>
 
-  <!-- Victory panel — right-side overlay, game continues behind it -->
+
+
+  <!-- Victory panel - right-side overlay, game continues behind it -->
+
   <div id="victory-screen" class="hidden">
-    <div id="victory-emblem">◈</div>
+
+    <div id="victory-emblem"></div>
+
     <h2 id="victory-title">MISSION COMPLETE</h2>
-    <p id="victory-subtitle">Dyson Sphere Online · Goliath Defeated</p>
+
+    <p id="victory-subtitle">Dyson Sphere Online and Goliath Defeated</p>
+
     <div id="victory-stats">
+
       <div id="victory-panels">80 panels assembled</div>
+
       <div id="victory-pilots">1 pilot online</div>
+
       <div id="victory-reset-timer">Match resets in <span id="victory-reset-seconds">45</span>s</div>
+
     </div>
+
     <div id="victory-actions">
+
       <div class="victory-action-btn">
+
         <span class="victory-key">ENTER</span>
+
         <span class="victory-action-label">Keep Playing</span>
+
       </div>
+
       <div class="victory-action-btn victory-action-restart">
+
         <span class="victory-key">R</span>
+
         <span class="victory-action-label">Restart Mission</span>
+
       </div>
+
       <div class="victory-action-btn victory-action-leave">
+
         <span class="victory-key">TAB</span>
+
         <span class="victory-action-label">Leave Game</span>
+
       </div>
+
     </div>
+
   </div>
+
+
 
   <script type="module" src="./src/main.js"></script>
+
 </body>
+
 </html>
+
+
+

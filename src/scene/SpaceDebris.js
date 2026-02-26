@@ -288,6 +288,7 @@ export class SpaceDebris {
       frag.mesh.scale.setScalar(Math.max(s, 0.01));
     }
 
+
     // Process respawn queue
     for (let i = this._respawnQueue.length - 1; i >= 0; i--) {
       const entry = this._respawnQueue[i];
