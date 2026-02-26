@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spaceship Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div id="canvas-container"></div>
+  <div id="entry-flash"></div>
+
+  <!-- Lost player side banner — slides in from the right, player keeps control -->
+  <div id="lost-banner">
+    <p id="lost-banner-title">ARE YOU LOST?</p>
+    <p id="lost-banner-hint"></p>
+    <div id="lost-banner-buttons">
+      <button id="lost-yes"><span class="lost-key">Y</span> WARP TO SPAWN</button>
+      <button id="lost-no"><span class="lost-key">N</span> I'M FINE</button>
+    </div>
+  </div>
+
+  <div id="crosshair">+</div>
+  <!-- Lead indicator — projects to predicted intercept point of nearest enemy -->
+  <div id="lead-indicator"></div>
+
+  <!-- Nav menu -->
+  <button id="nav-hamburger" aria-label="Navigation menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div id="nav-panel">
+    <div id="nav-panel-inner">
+      <h3 class="nav-heading">WARP TO PLANET</h3>
+      <div id="nav-planet-list"></div>
+    </div>
+  </div>
+
+  <div id="intro-screen">
+    <h1 class="neon-title">STELLAR PORTFOLIO</h1>
+    <p class="intro-subtitle">Navigate through space to discover my projects</p>
+    <p class="intro-controls intro-controls-desktop">Left Click to shoot &bull; WASD to fly &bull; Mouse to look &bull; Shift to boost</p>
+    <p class="intro-controls intro-controls-mobile">Joystick to fly &bull; Drag to look &bull; Tap boost</p>
+    <button id="launch-btn">LAUNCH</button>
+  </div>
+
+  <div id="project-card" class="hidden">
+    <h2 id="card-title"></h2>
+    <p id="card-description"></p>
+    <div id="card-tech"></div>
+    <div id="card-links">
+      <a id="card-github" href="#" target="_blank" rel="noopener">GitHub</a>
+      <a id="card-live" href="#" target="_blank" rel="noopener">Live Demo</a>
+    </div>
+    <p class="card-hint">Fly closer to open project</p>
+  </div>
+
+  <!-- Touch controls (mobile only) -->
+  <div id="joystick-zone">
+    <div id="joystick-base">
+      <div id="joystick-thumb"></div>
+    </div>
+  </div>
+  <div id="look-zone"></div>
+  <button id="boost-btn">BOOST</button>
+  <button id="fire-btn">FIRE</button>
+
+  <!-- Standalone shield HUD — always visible after launch (top-left) -->
+  <div id="hud-shield" class="hidden">
+    <span class="game-hud-shield-icon">◈</span>
+    <div id="game-hud-shield-bar">
+      <div id="game-hud-shield-fill"></div>
+    </div>
+    <span id="game-hud-shield-pct">100</span>
+  </div>
+
+  <!-- Game HUD — multiplayer mission status (top-right corner) -->
+  <div id="game-hud" class="hidden">
+    <div id="game-hud-phase">GATHERING</div>
+    <div id="game-hud-objective">Collect ore &amp; parts — deposit at the MOTHERSHIP</div>
+    <div id="game-hud-progress-bar">
+      <div id="game-hud-progress-fill"></div>
+    </div>
+    <div id="game-hud-panels">0 / 15 PANELS</div>
+    <div id="game-hud-players">0 PILOTS ONLINE</div>
+
+    <!-- Cargo ship HP bar — visible during phase 1 (escort) -->
+    <div id="game-hud-cargo-hp" class="hidden">
+      <div class="game-hud-divider"></div>
+      <div id="game-hud-cargo-hp-header">CARGO SHIP HULL</div>
+      <div id="game-hud-cargo-hp-bar">
+        <div id="game-hud-cargo-hp-fill"></div>
+      </div>
+    </div>
+
+    <!-- Boss health bar — only visible during phase 2 (boss) -->
+    <div id="game-hud-boss" class="hidden">
+      <div class="game-hud-divider"></div>
+      <div id="game-hud-boss-header">⚠ GOLIATH</div>
+      <div id="game-hud-boss-bar">
+        <div id="game-hud-boss-fill"></div>
+      </div>
+    </div>
+
+    <!-- Special laser energy — visible during phase 2 (boss) -->
+    <div id="game-hud-special-energy" class="hidden">
+      <div id="game-hud-special-energy-header">⚡ SPECIAL [F]</div>
+      <div id="game-hud-special-energy-bar">
+        <div id="game-hud-special-energy-fill"></div>
+      </div>
+    </div>
+
+    <div id="game-hud-countdown" class="hidden">
+      <div class="game-hud-divider"></div>
+      <div id="game-hud-countdown-header">⏱ CONSTRUCTION WINDOW</div>
+      <div id="game-hud-countdown-timer">1:00</div>
+    </div>
+
+    <div class="game-hud-divider"></div>
+    <div id="game-hud-cargo-header">CARGO HOLD</div>
+    <div class="game-hud-cargo-row">
+      <span class="cargo-type-label ore">ORE</span>
+      <div class="game-hud-mini-bar ore"><div id="game-hud-ore-fill" class="game-hud-mini-fill"></div></div>
+      <span id="game-hud-ore-count" class="cargo-count">0</span>
+    </div>
+    <div class="game-hud-cargo-row">
+      <span class="cargo-type-label parts">PARTS</span>
+      <div class="game-hud-mini-bar parts"><div id="game-hud-parts-fill" class="game-hud-mini-fill"></div></div>
+      <span id="game-hud-parts-count" class="cargo-count">0</span>
+    </div>
+  </div>
+
+  <!-- Beacon proximity hint — slides in from right like lost-banner -->
+  <div id="join-beacon-hint">
+    <span class="beacon-hint-icon">◈</span>
+    <div class="beacon-hint-text">
+      <span class="beacon-hint-title">MULTIPLAYER GAME</span>
+      <span class="beacon-hint-sub"><span class="lost-key">E</span> to join &bull; or ignore to explore portfolio</span>
+    </div>
+  </div>
+
+  <!-- Join game modal -->
+  <div id="join-game-ui" class="hidden">
+    <div id="join-game-panel">
+      <h2 class="join-title">JOIN MULTIPLAYER</h2>
+      <p class="join-subtitle">Fly alongside other pilots &amp; build the Dyson sphere</p>
+
+      <label class="join-label" for="join-callsign">CALLSIGN</label>
+      <input id="join-callsign" class="join-input" type="text"
+             maxlength="12" placeholder="PILOT" autocomplete="off" spellcheck="false" />
+
+      <label class="join-label">SHIP COLOUR</label>
+      <div id="join-color-picker"></div>
+
+      <div class="join-buttons">
+        <button id="join-btn">LAUNCH INTO GAME</button>
+        <button id="join-cancel-btn">CANCEL</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Objective banner — fixed screen-space, always visible during active objective -->
+  <div id="objective-banner" class="hidden">
+    <span id="objective-banner-text"></span>
+  </div>
+
+  <!-- Wave / event warning banner — slides in from top -->
+  <div id="wave-warning" class="hidden">
+    <span id="wave-warning-icon">⚠</span>
+    <span id="wave-warning-text">WAVE 1 INCOMING</span>
+  </div>
+
+  <!-- Controls hint — fades in after launch, auto-hides -->
+  <div id="controls-hint" class="hidden">
+    <span>WASD fly</span>
+    <span class="controls-sep">·</span>
+    <span>Mouse aim</span>
+    <span class="controls-sep">·</span>
+    <span>Shift boost</span>
+    <span class="controls-sep">·</span>
+    <span>Click shoot</span>
+    <span class="controls-sep">·</span>
+    <span>Right-click barrel roll</span>
+  </div>
+
+  <!-- Mission countdown overlay -->
+  <div id="mission-countdown" class="hidden">
+    <div id="mission-countdown-number"></div>
+    <div id="mission-countdown-text">MISSION START</div>
+  </div>
+
+  <!-- Victory panel — right-side overlay, game continues behind it -->
+  <div id="victory-screen" class="hidden">
+    <div id="victory-emblem">◈</div>
+    <h2 id="victory-title">MISSION COMPLETE</h2>
+    <p id="victory-subtitle">Dyson Sphere Online · Goliath Defeated</p>
+    <div id="victory-stats">
+      <div id="victory-panels">80 panels assembled</div>
+      <div id="victory-pilots">1 pilot online</div>
+      <div id="victory-reset-timer">Match resets in <span id="victory-reset-seconds">45</span>s</div>
+    </div>
+    <div id="victory-actions">
+      <div class="victory-action-btn">
+        <span class="victory-key">ENTER</span>
+        <span class="victory-action-label">Keep Playing</span>
+      </div>
+      <div class="victory-action-btn victory-action-restart">
+        <span class="victory-key">R</span>
+        <span class="victory-action-label">Restart Mission</span>
+      </div>
+      <div class="victory-action-btn victory-action-leave">
+        <span class="victory-key">TAB</span>
+        <span class="victory-action-label">Leave Game</span>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

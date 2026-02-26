@@ -1,0 +1,13 @@
+{
+  "name": "spaceship-portfolio-server",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0",
+    "uuid": "^11.0.0"
+  }
+}
