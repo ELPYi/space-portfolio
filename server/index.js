@@ -1,8 +1,87 @@
+const fs = require('node:fs');
+const path = require('node:path');
+const http = require('node:http');
 const { WebSocketServer } = require('ws');
 const { v4: uuidv4 } = require('uuid');
 
-const PORT = process.env.PORT || 3001;
-const wss = new WebSocketServer({ port: PORT });
+const PORT = Number(process.env.PORT) || 3001;
+const DIST_DIR = path.resolve(__dirname, '..', 'dist');
+
+const MIME_TYPES = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'application/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.svg': 'image/svg+xml',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.webp': 'image/webp',
+  '.ico': 'image/x-icon',
+  '.map': 'application/json; charset=utf-8',
+};
+
+function sendFile(req, res, filePath) {
+  fs.readFile(filePath, (err, data) => {
+    if (err) {
+      res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+      if (req.method !== 'HEAD') res.end('Not Found');
+      else res.end();
+      return;
+    }
+
+    const ext = path.extname(filePath).toLowerCase();
+    const type = MIME_TYPES[ext] || 'application/octet-stream';
+    res.writeHead(200, {
+      'Content-Type': type,
+      'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=31536000, immutable',
+    });
+    if (req.method !== 'HEAD') res.end(data);
+    else res.end();
+  });
+}
+
+function serveApp(req, res) {
+  if (req.method !== 'GET' && req.method !== 'HEAD') {
+    res.writeHead(405, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Method Not Allowed');
+    return;
+  }
+
+  if (!fs.existsSync(DIST_DIR)) {
+    res.writeHead(503, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Build assets not found. Run "npm run build" in project root.');
+    return;
+  }
+
+  const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+  const pathname = decodeURIComponent(url.pathname);
+
+  let requestedPath = pathname === '/' ? '/index.html' : pathname;
+  const resolvedPath = path.resolve(DIST_DIR, `.${requestedPath}`);
+
+  if (!resolvedPath.startsWith(DIST_DIR)) {
+    res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Forbidden');
+    return;
+  }
+
+  if (fs.existsSync(resolvedPath) && fs.statSync(resolvedPath).isFile()) {
+    sendFile(req, res, resolvedPath);
+    return;
+  }
+
+  if (!path.extname(requestedPath)) {
+    sendFile(req, res, path.join(DIST_DIR, 'index.html'));
+    return;
+  }
+
+  res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('Not Found');
+}
+
+const server = http.createServer(serveApp);
+const wss = new WebSocketServer({ server });
 
 // players: Map<id, { ws, id, callsign, color, x, y, z, qx, qy, qz, qw }>
 const players = new Map();
@@ -262,4 +341,7 @@ wss.on('connection', (ws) => {
   ws.on('error', (err) => console.error('WS error:', err.message));
 });
 
-console.log(`Multiplayer server running on ws://localhost:${PORT}`);
+server.listen(PORT, () => {
+  console.log(`[HTTP] Serving app on http://0.0.0.0:${PORT}`);
+  console.log(`[WS] Multiplayer endpoint on ws://0.0.0.0:${PORT}`);
+});

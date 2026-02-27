@@ -390,7 +390,11 @@ const lostDetector = new LostDetector({
 });
 
 // ── Multiplayer ────────────────────────────────────────────────────────────────
-const WS_URL = 'ws://localhost:3001';
+const WS_URL = import.meta.env.VITE_WS_URL || (
+  import.meta.env.DEV
+    ? 'ws://localhost:3001'
+    : `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}`
+);
 const networkManager  = new NetworkManager(WS_URL);
 const remotePlayers   = new Map(); // id → RemotePlayer
 const gameState       = new GameState();
