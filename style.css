@@ -789,6 +789,14 @@ body {
   border: 1px solid rgba(110, 170, 255, 0.2);
 }
 
+.nav-bottom-action {
+  position: sticky;
+  bottom: 0;
+  margin-top: 18px;
+  padding-top: 14px;
+  background: linear-gradient(to top, rgba(10, 0, 30, 0.95) 78%, rgba(10, 0, 30, 0));
+}
+
 .nav-controls-title {
   font-family: 'Orbitron', sans-serif;
   letter-spacing: 0.14em;
@@ -1275,6 +1283,34 @@ body {
   justify-content: center;
   font-size: 0.85rem;
   color: #ff6655;
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+}
+
+.nav-landing-item {
+  border: 1px solid rgba(70, 210, 255, 0.35) !important;
+  background: rgba(25, 120, 255, 0.12) !important;
+  border-radius: 4px;
+}
+
+.nav-landing-item:hover {
+  background: rgba(35, 150, 255, 0.2) !important;
+  border-color: rgba(120, 220, 255, 0.7) !important;
+}
+
+.nav-landing-item .nav-planet-name {
+  color: #9de8ff !important;
+  font-weight: 700;
+}
+
+.nav-landing-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: #9de8ff;
   margin-right: 0.75rem;
   flex-shrink: 0;
 }

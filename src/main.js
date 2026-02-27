@@ -167,6 +167,9 @@ function warpToSpawn() {
   });
 }
 
+const introScreenEl = document.getElementById('intro-screen');
+let isOnLandingPage = !introScreenEl?.classList.contains('hidden');
+
 // Nav menu — warp to any planet
 const navMenu = new NavMenu(PROJECTS, (project) => {
   if (networkManager.connected) return; // disable portal warps during multiplayer
@@ -188,6 +191,7 @@ const navMenu = new NavMenu(PROJECTS, (project) => {
   });
 });
 navMenu.onSpawn = warpToSpawn;
+navMenu.allowAutoOpen = !isOnLandingPage;
 navMenu.hamburger?.addEventListener('click', () => {
   if (!navMenu.isOpen && document.pointerLockElement) {
     document.exitPointerLock();
@@ -264,6 +268,8 @@ function showWaveWarning(text) {
 
 // HUD
 const hud = new HUD(() => {
+  isOnLandingPage = false;
+  navMenu.allowAutoOpen = true;
   soundManager.init();
   soundManager.playLaunchBeep();
 
@@ -441,7 +447,7 @@ let _bossPhaseTime     = 0; // seconds elapsed in phase 2
 let _lastPanelSnapTime = 0; // ms — throttle construction tick sound
 
 // ── Shared game reset — used by victory panel "Leave" and nav "Restart" ──────
-function doResetGame() {
+function doResetGame({ warpBack = true } = {}) {
   networkManager.disconnect();
 
   // Stop combat music — fade back to ambient
@@ -494,8 +500,27 @@ function doResetGame() {
   joinBeacon.show();
   beaconHint.classList.remove('visible');
 
-  // Warp the player back to the portfolio spawn
-  warpToSpawn();
+  // Warp the player back to the portfolio spawn unless leaving to landing page
+  if (warpBack) {
+    warpToSpawn();
+  }
+}
+
+function leaveToLandingPage() {
+  isOnLandingPage = true;
+  navMenu.allowAutoOpen = false;
+  doResetGame({ warpBack: false });
+  navMenu.hide();
+  touchControls?.hide();
+  joinGameUI.hide();
+  projectCard.hide();
+  dismissWarpHint();
+  _warpHintDismissed = false;
+  introScreenEl?.classList.remove('hidden');
+  if (document.fullscreenElement && document.exitFullscreen) {
+    document.exitFullscreen().catch(() => {});
+  }
+  document.exitPointerLock();
 }
 
 // ── Victory screen — keep playing (just dismiss the panel) ───────────────────
@@ -508,6 +533,7 @@ victoryScreen.onRestart = doResetGame;
 
 // ── Victory screen — leave game ───────────────────────────────────────────────
 victoryScreen._onContinue = doResetGame;
+navMenu.onLeaveToLanding = leaveToLandingPage;
 
 // ── Ship health ──────────────────────────────────────────────────────────────
 shipHealth.onChange = (hp, maxHp) => {
@@ -829,7 +855,13 @@ networkManager.onServerClose = () => {
 // Pointer lock change — show/hide crosshair (desktop only)
 if (!isMobile) {
   document.addEventListener('keydown', (e) => {
-    if (e.code === 'KeyM' && !introAnimation.isActive && !warpAnimation.isActive && !entryAnimation.isActive) {
+    if (
+      e.code === 'KeyM' &&
+      !isOnLandingPage &&
+      !introAnimation.isActive &&
+      !warpAnimation.isActive &&
+      !entryAnimation.isActive
+    ) {
       if (navMenu.isOpen) {
         navMenu.close();
       } else {
@@ -846,7 +878,12 @@ if (!isMobile) {
     if (!locked) {
       leadIndicatorEl.style.display = 'none';
       dismissWarpHint();
-      if (!introAnimation.isActive && !warpAnimation.isActive && !entryAnimation.isActive) {
+      if (
+        !isOnLandingPage &&
+        !introAnimation.isActive &&
+        !warpAnimation.isActive &&
+        !entryAnimation.isActive
+      ) {
         navMenu.open();
       }
     }

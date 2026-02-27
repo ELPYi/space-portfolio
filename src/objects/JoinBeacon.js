@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
-// Off to the right of spawn — visible but not blocking the portfolio view
-export const BEACON_POSITION = new THREE.Vector3(160, 5, -60);
+// Off to the left of spawn so it's visible sooner from the initial spawn view
+export const BEACON_POSITION = new THREE.Vector3(-70, 5, -60);
 
 const PROMPT_RADIUS  = 30; // show hint when this close
 const INTERACT_RADIUS = 12; // "fly into" the beacon

@@ -8,12 +8,16 @@ export class NavMenu {
     this.onWarp = onWarp;
     this.isOpen  = false;
     this._shown  = false;
+    this.onLeaveToLanding = null;
+    this.allowAutoOpen = true;
 
     this.hamburger = document.getElementById('nav-hamburger');
     this.panel = document.getElementById('nav-panel');
+    this.panelInner = document.getElementById('nav-panel-inner');
     this.list = document.getElementById('nav-planet-list');
 
     this._buildList();
+    this._buildBottomActions();
     this._bindEvents();
   }
 
@@ -71,6 +75,32 @@ export class NavMenu {
     this.list.appendChild(spawnItem);
   }
 
+  _buildBottomActions() {
+    const wrap = document.createElement('div');
+    wrap.className = 'nav-bottom-action';
+
+    const leaveLandingBtn = document.createElement('button');
+    leaveLandingBtn.className = 'nav-planet-item nav-landing-item';
+
+    const icon = document.createElement('span');
+    icon.className = 'nav-landing-icon';
+    icon.textContent = '↩';
+
+    const label = document.createElement('span');
+    label.className = 'nav-planet-name';
+    label.textContent = 'Leave to Landing Page';
+
+    leaveLandingBtn.appendChild(icon);
+    leaveLandingBtn.appendChild(label);
+    leaveLandingBtn.addEventListener('click', () => {
+      this.close();
+      this.onLeaveToLanding?.();
+    });
+
+    wrap.appendChild(leaveLandingBtn);
+    this.panelInner?.appendChild(wrap);
+  }
+
   _bindEvents() {
     this.hamburger.addEventListener('click', () => {
       if (this.isOpen) {
@@ -89,7 +119,7 @@ export class NavMenu {
 
     // Open when window loses focus (user tabs away)
     window.addEventListener('blur', () => {
-      if (this._shown && !this.isOpen) this.open();
+      if (this.allowAutoOpen && this._shown && !this.isOpen) this.open();
     });
   }
 
