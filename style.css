@@ -310,6 +310,13 @@ body {
   align-items: center;
 }
 
+.launch-cta-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: nowrap;
+}
+
 .btn-primary,
 .btn-secondary,
 .btn-ghost {
@@ -1009,8 +1016,8 @@ body {
     flex-direction: column;
     align-items: flex-start;
   }
-  .cta-bubble {
-    order: -1;
+  .launch-cta-row {
+    width: 100%;
   }
   .controls-card {
     max-width: none;
