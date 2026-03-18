@@ -103,6 +103,16 @@
 
 
   <div id="intro-screen">
+    <nav class="landing-nav">
+      <div class="landing-nav-inner">
+        <span class="landing-nav-logo">ELPY</span>
+        <div class="landing-nav-tabs">
+          <button class="landing-nav-tab active" data-tab="home">Home</button>
+          <button class="landing-nav-tab" data-tab="games">Games</button>
+        </div>
+      </div>
+    </nav>
+
     <div id="mobile-warning" class="mobile-warning hidden" role="dialog" aria-live="polite">
       <div class="mobile-warning-card">
         <div class="mobile-warning-title">Heads up</div>
@@ -112,6 +122,7 @@
         <button id="mobile-warning-ok" class="btn-secondary">I UNDERSTAND</button>
       </div>
     </div>
+    <div id="tab-home" class="tab-panel">
     <div class="landing">
       <section class="landing-hero">
         <div class="hero-copy">
@@ -310,6 +321,88 @@
         </div>
       </section>
     </div>
+    </div><!-- end #tab-home -->
+
+    <div id="tab-games" class="tab-panel hidden">
+      <div class="games-page">
+        <div class="section-header">
+          <h2>Games</h2>
+          <p>Multiplayer games you can play right now.</p>
+        </div>
+        <div class="games-grid">
+
+          <a class="game-card" href="/games/scattergories" target="_blank" rel="noopener">
+            <div class="game-card-thumb">
+              <picture>
+                <source srcset="./thumb-scattergories-game.webp" type="image/webp" />
+                <img src="./thumb-scattergories-game.jpg" alt="Scattergories Online" />
+              </picture>
+            </div>
+            <div class="game-card-info">
+              <h3>Scattergories Online</h3>
+              <p>Real-time multiplayer party game with live voting and custom lobbies.</p>
+              <div class="game-card-tags">
+                <span>React</span><span>Socket.IO</span><span>Multiplayer</span>
+              </div>
+            </div>
+            <span class="game-card-play">PLAY &rarr;</span>
+          </a>
+
+          <a class="game-card" href="/games/gamba" target="_blank" rel="noopener">
+            <div class="game-card-thumb">
+              <picture>
+                <source srcset="./thumb-gamba-game.webp" type="image/webp" />
+                <img src="./thumb-gamba-game.jpg" alt="Gamba!" />
+              </picture>
+            </div>
+            <div class="game-card-info">
+              <h3>Gamba!</h3>
+              <p>Multiplayer party game mixing auctions, crash betting, and slots.</p>
+              <div class="game-card-tags">
+                <span>React</span><span>Socket.IO</span><span>Multiplayer</span>
+              </div>
+            </div>
+            <span class="game-card-play">PLAY &rarr;</span>
+          </a>
+
+          <a class="game-card" href="/games/tictactoe" target="_blank" rel="noopener">
+            <div class="game-card-thumb">
+              <picture>
+                <source srcset="./thumb-tictactoe-game.webp" type="image/webp" />
+                <img src="./thumb-tictactoe-game.jpg" alt="Tic Tac Toe" />
+              </picture>
+            </div>
+            <div class="game-card-info">
+              <h3>Tic Tac Toe</h3>
+              <p>Online multiplayer with room codes, instant turn sync and rematch voting.</p>
+              <div class="game-card-tags">
+                <span>React</span><span>Socket.IO</span><span>Multiplayer</span>
+              </div>
+            </div>
+            <span class="game-card-play">PLAY &rarr;</span>
+          </a>
+
+          <a class="game-card" href="/games/meltdown-clowns" target="_blank" rel="noopener">
+            <div class="game-card-thumb">
+              <picture>
+                <source srcset="./thumb-meltdown-clowns-game.webp" type="image/webp" />
+                <img src="./thumb-meltdown-clowns-game.jpg" alt="Meltdown Clowns" />
+              </picture>
+            </div>
+            <div class="game-card-info">
+              <h3>Meltdown Clowns</h3>
+              <p>Co-op reactor crisis game where 2–4 players survive escalating failures.</p>
+              <div class="game-card-tags">
+                <span>React</span><span>WebSockets</span><span>Co-op</span>
+              </div>
+            </div>
+            <span class="game-card-play">PLAY &rarr;</span>
+          </a>
+
+        </div>
+      </div>
+    </div><!-- end #tab-games -->
+
   </div>
 
 

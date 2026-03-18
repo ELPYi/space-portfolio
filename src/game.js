@@ -37,6 +37,8 @@ import { ShipHealth } from './game/ShipHealth.js';
 import { GoliathBoss } from './objects/GoliathBoss.js';
 import { VictoryScreen } from './ui/VictoryScreen.js';
 
+let _resumeFn = null;
+
 export function init() {
 
 // Mobile detection
@@ -511,6 +513,7 @@ function leaveToLandingPage() {
   projectCard.hide();
   dismissWarpHint();
   _warpHintDismissed = false;
+  soundManager.stop();
   introScreenEl?.classList.remove('hidden');
   const launchBtn = document.getElementById('launch-btn');
   if (launchBtn) { launchBtn.textContent = 'LAUNCH'; launchBtn.disabled = false; }
@@ -1223,6 +1226,22 @@ function animate() {
   labelRenderer.render(sm.scene, sm.camera);
 }
 
+// Register resume closure so re-entering the game doesn't re-run init()
+_resumeFn = () => {
+  introScreenEl?.classList.add('hidden');
+  isOnLandingPage = false;
+  navMenu.allowAutoOpen = true;
+  soundManager.ctx?.resume();
+  soundManager.playLaunchBeep();
+  if (isMobile) touchControls?.show();
+  navMenu.show();
+};
+
 animate();
 
 } // end init()
+
+// Called when player returns to game from landing page (scene already exists)
+export function resume() {
+  _resumeFn?.();
+}

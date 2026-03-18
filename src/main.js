@@ -10,14 +10,31 @@ if (isMobile) {
   }
 }
 
+// Navbar tab switching
+document.querySelectorAll('.landing-nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const target = tab.dataset.tab;
+    document.querySelectorAll('.landing-nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+    tab.classList.add('active');
+    document.getElementById(`tab-${target}`).classList.remove('hidden');
+  });
+});
+
 // Lazy-load the entire 3D scene only when the user clicks Launch
+let gameLoaded = false;
 const launchBtn = document.getElementById('launch-btn');
 launchBtn.addEventListener('click', async () => {
   launchBtn.textContent = 'LOADING...';
   launchBtn.disabled = true;
   try {
-    const { init } = await import('./game.js');
-    init();
+    const { init, resume } = await import('./game.js');
+    if (!gameLoaded) {
+      gameLoaded = true;
+      init();
+    } else {
+      resume();
+    }
   } catch (err) {
     console.error('Failed to load scene:', err);
     launchBtn.textContent = 'LAUNCH';

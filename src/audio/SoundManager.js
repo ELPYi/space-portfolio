@@ -25,6 +25,11 @@ export class SoundManager {
     });
   }
 
+  /** Suspend all audio — called when returning to landing page */
+  stop() {
+    if (this.ctx) this.ctx.suspend();
+  }
+
   /** Fade out all audio (for planet entry) */
   mute() {
     if (!this.master) return;

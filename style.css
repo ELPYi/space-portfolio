@@ -258,10 +258,177 @@ body {
 }
 
 /* Landing layout */
+/* ── Landing navbar ─────────────────────────────────────── */
+.landing-nav {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgba(6, 10, 24, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.landing-nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 6vw;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.landing-nav-logo {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+}
+
+.landing-nav-tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.landing-nav-tab {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  padding: 6px 16px;
+  border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.landing-nav-tab:hover {
+  color: var(--ink);
+  background: rgba(63, 208, 255, 0.07);
+}
+
+.landing-nav-tab.active {
+  color: var(--accent);
+  background: rgba(63, 208, 255, 0.12);
+}
+
+/* ── Tab panels ─────────────────────────────────────────── */
+.tab-panel.hidden { display: none; }
+
+/* ── Games page ─────────────────────────────────────────── */
+.games-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 56px 6vw 120px;
+}
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.game-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.game-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(63, 208, 255, 0.45);
+  box-shadow: 0 8px 32px rgba(63, 208, 255, 0.12);
+}
+
+.game-card-thumb {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.game-card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.game-card:hover .game-card-thumb img {
+  transform: scale(1.04);
+}
+
+.game-card-info {
+  padding: 20px 20px 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.game-card-info h3 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+}
+
+.game-card-info p {
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.game-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.game-card-tags span {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(63, 208, 255, 0.1);
+  color: var(--accent);
+  border: 1px solid rgba(63, 208, 255, 0.2);
+}
+
+.game-card-play {
+  display: block;
+  padding: 12px 20px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--accent);
+  border-top: 1px solid var(--panel-border);
+  transition: background 0.2s;
+}
+
+.game-card:hover .game-card-play {
+  background: rgba(63, 208, 255, 0.08);
+}
+
 .landing {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 72px 6vw 120px;
+  padding: 48px 6vw 120px;
   display: flex;
   flex-direction: column;
   gap: 80px;
