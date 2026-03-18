@@ -11,39 +11,27 @@ class AudioManager {
   private musicTimeouts: number[] = [];
   private muted: boolean;
   private loopHandle: number | null = null;
-  private pendingMusic: MusicType | null = null;
-  private interactionListenerAdded = false;
 
   constructor() {
     this.muted = localStorage.getItem('scattergories-muted') === 'true';
-    this.setupInteractionListener();
   }
 
-  // Browsers block AudioContext until a user gesture. Listen for the first
-  // click/touch/keydown and resume the context + start any pending music.
-  private setupInteractionListener() {
-    if (this.interactionListenerAdded) return;
-    this.interactionListenerAdded = true;
-
-    const resume = async () => {
-      if (this.ctx && this.ctx.state === 'suspended') {
-        await this.ctx.resume();
-      }
-      // If music was requested before the user interacted, start it now
-      if (this.pendingMusic) {
-        const m = this.pendingMusic;
-        this.pendingMusic = null;
-        if (m === 'menu') this.playMenuMusic();
-        else if (m === 'game') this.playGameMusic();
-      }
-      document.removeEventListener('click', resume);
-      document.removeEventListener('touchstart', resume);
-      document.removeEventListener('keydown', resume);
-    };
-
-    document.addEventListener('click', resume, { once: true });
-    document.addEventListener('touchstart', resume, { once: true });
-    document.addEventListener('keydown', resume, { once: true });
+  // Start music when the context is ready. If suspended (browser autoplay
+  // policy), ctx.resume() holds as a pending Promise and Chrome resolves it
+  // automatically on the next user gesture — no manual event wiring needed.
+  private startWhenReady(type: MusicType) {
+    const ctx = this.ensureContext();
+    if (ctx.state === 'running') {
+      if (type === 'menu') this.loopMenuMusic();
+      else this.loopGameMusic();
+    } else {
+      ctx.resume().then(() => {
+        if (this.currentMusic === type) {
+          if (type === 'menu') this.loopMenuMusic();
+          else this.loopGameMusic();
+        }
+      });
+    }
   }
 
   private ensureContext() {
@@ -56,9 +44,6 @@ class AudioManager {
       this.sfxGain = this.ctx.createGain();
       this.sfxGain.gain.value = this.muted ? 0 : 0.4;
       this.sfxGain.connect(this.ctx.destination);
-    }
-    if (this.ctx.state === 'suspended') {
-      this.ctx.resume();
     }
     return this.ctx;
   }
@@ -79,26 +64,15 @@ class AudioManager {
   playMenuMusic() {
     if (this.currentMusic === 'menu') return;
     this.stopMusic();
-    const ctx = this.ensureContext();
-    // If browser hasn't allowed audio yet, queue it for first interaction
-    if (ctx.state === 'suspended') {
-      this.pendingMusic = 'menu';
-      return;
-    }
     this.currentMusic = 'menu';
-    this.loopMenuMusic();
+    this.startWhenReady('menu');
   }
 
   playGameMusic() {
     if (this.currentMusic === 'game') return;
     this.stopMusic();
-    const ctx = this.ensureContext();
-    if (ctx.state === 'suspended') {
-      this.pendingMusic = 'game';
-      return;
-    }
     this.currentMusic = 'game';
-    this.loopGameMusic();
+    this.startWhenReady('game');
   }
 
   stopMusic() {
