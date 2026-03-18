@@ -79,6 +79,10 @@ export class SoundManager {
    */
   _scheduleCombatLoop() {
     if (!this._combatActive || !this.ctx) return;
+    if (this.ctx.state !== 'running') {
+      setTimeout(() => this._scheduleCombatLoop(), 500);
+      return;
+    }
 
     const ctx  = this.ctx;
     const dest = this._combatGain;
@@ -238,6 +242,10 @@ export class SoundManager {
     };
 
     const scheduleLoop = () => {
+      if (ctx.state !== 'running') {
+        setTimeout(scheduleLoop, 500);
+        return;
+      }
       const now = ctx.currentTime + 0.1;
       for (let i = 0; i < notes.length; i++) {
         scheduleNote(notes[i], now + i * noteLength);

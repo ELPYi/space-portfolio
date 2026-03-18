@@ -25,9 +25,9 @@ class AudioManager {
     if (this.interactionListenerAdded) return;
     this.interactionListenerAdded = true;
 
-    const resume = () => {
+    const resume = async () => {
       if (this.ctx && this.ctx.state === 'suspended') {
-        this.ctx.resume();
+        await this.ctx.resume();
       }
       // If music was requested before the user interacted, start it now
       if (this.pendingMusic) {
