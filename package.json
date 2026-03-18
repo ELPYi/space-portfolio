@@ -5,7 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && npm run build:games",
+    "build:games": "npm run build:tictactoe && npm run build:gamba && npm run build:scattergories && npm run build:meltdown-clowns",
+    "build:tictactoe": "npm install --prefix games/tictactoe && npm run build --prefix games/tictactoe",
+    "build:gamba": "npm install --prefix games/gamba && npm run build --prefix games/gamba",
+    "build:scattergories": "npm install --prefix games/scattergories && npm run build --prefix games/scattergories",
+    "build:meltdown-clowns": "npm install --prefix games/meltdown-clowns && npm run build --prefix games/meltdown-clowns",
     "preview": "vite preview"
   },
   "dependencies": {

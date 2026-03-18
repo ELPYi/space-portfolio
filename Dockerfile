@@ -1,10 +1,14 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 
+# Install portfolio dependencies
 COPY package*.json ./
 RUN npm ci
 
+# Copy full source
 COPY . .
+
+# Build portfolio + all games
 RUN npm run build
 
 FROM node:20-alpine AS runtime

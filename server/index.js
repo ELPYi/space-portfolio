@@ -72,6 +72,12 @@ function serveApp(req, res) {
   }
 
   if (!path.extname(requestedPath)) {
+    // Route game sub-paths to their own index.html
+    const gameMatch = pathname.match(/^\/games\/(tictactoe|gamba|scattergories|meltdown-clowns)(\/|$)/);
+    if (gameMatch) {
+      sendFile(req, res, path.join(DIST_DIR, 'games', gameMatch[1], 'index.html'));
+      return;
+    }
     sendFile(req, res, path.join(DIST_DIR, 'index.html'));
     return;
   }

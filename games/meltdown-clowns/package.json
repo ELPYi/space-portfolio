@@ -1,0 +1,16 @@
+{
+  "name": "meltdown-clowns-workspace",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "workspaces": [
+    "shared",
+    "client"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace=shared && npm run build --workspace=client"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}
