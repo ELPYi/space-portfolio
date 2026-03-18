@@ -14,24 +14,33 @@ class AudioManager {
 
   constructor() {
     this.muted = localStorage.getItem('scattergories-muted') === 'true';
+    this.setupInteractionListener();
   }
 
-  // Start music when the context is ready. If suspended (browser autoplay
-  // policy), ctx.resume() holds as a pending Promise and Chrome resolves it
-  // automatically on the next user gesture — no manual event wiring needed.
-  private startWhenReady(type: MusicType) {
-    const ctx = this.ensureContext();
-    if (ctx.state === 'running') {
-      if (type === 'menu') this.loopMenuMusic();
-      else this.loopGameMusic();
-    } else {
-      ctx.resume().then(() => {
-        if (this.currentMusic === type) {
-          if (type === 'menu') this.loopMenuMusic();
-          else this.loopGameMusic();
+  // ctx.resume() only works inside a user gesture. Listen for the first
+  // gesture, resume the context, then start whatever music is pending.
+  private setupInteractionListener() {
+    const onGesture = () => {
+      document.removeEventListener('click', onGesture);
+      document.removeEventListener('touchstart', onGesture);
+      document.removeEventListener('keydown', onGesture);
+
+      if (!this.ctx || this.ctx.state !== 'suspended') return;
+
+      this.ctx.resume().then(() => {
+        if (this.currentMusic === 'menu') {
+          this.currentMusic = null;
+          this.playMenuMusic();
+        } else if (this.currentMusic === 'game') {
+          this.currentMusic = null;
+          this.playGameMusic();
         }
       });
-    }
+    };
+
+    document.addEventListener('click', onGesture);
+    document.addEventListener('touchstart', onGesture);
+    document.addEventListener('keydown', onGesture);
   }
 
   private ensureContext() {
@@ -64,15 +73,19 @@ class AudioManager {
   playMenuMusic() {
     if (this.currentMusic === 'menu') return;
     this.stopMusic();
+    const ctx = this.ensureContext();
     this.currentMusic = 'menu';
-    this.startWhenReady('menu');
+    if (ctx.state !== 'running') return; // onGesture will start it
+    this.loopMenuMusic();
   }
 
   playGameMusic() {
     if (this.currentMusic === 'game') return;
     this.stopMusic();
+    const ctx = this.ensureContext();
     this.currentMusic = 'game';
-    this.startWhenReady('game');
+    if (ctx.state !== 'running') return; // onGesture will start it
+    this.loopGameMusic();
   }
 
   stopMusic() {
