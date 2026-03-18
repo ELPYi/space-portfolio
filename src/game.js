@@ -512,6 +512,8 @@ function leaveToLandingPage() {
   dismissWarpHint();
   _warpHintDismissed = false;
   introScreenEl?.classList.remove('hidden');
+  const launchBtn = document.getElementById('launch-btn');
+  if (launchBtn) { launchBtn.textContent = 'LAUNCH'; launchBtn.disabled = false; }
   if (document.fullscreenElement && document.exitFullscreen) {
     document.exitFullscreen().catch(() => {});
   }
