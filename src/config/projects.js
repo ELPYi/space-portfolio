@@ -56,4 +56,18 @@ export const PROJECTS = [
     scale: 1.8,
     position: { x: -60, y: -10, z: -550 },
   },
+  {
+    id: 'how-old',
+    name: 'How Old Are You Really?',
+    description: 'Enter your birthday and discover what your age actually means — in heartbeats, miles around the sun, full moons, ISS orbits, and more. Numbers update live in real time.',
+    techStack: ['HTML', 'CSS', 'JavaScript'],
+    github: 'https://github.com/ELPYi',
+    liveUrl: '/games/how-old',
+    planetColor: 0xaa5577,
+    atmosColor: 0xff88bb,
+    accentColor: 0xff66aa,
+    hasRing: false,
+    scale: 1.1,
+    position: { x: 100, y: 12, z: -700 },
+  },
 ];

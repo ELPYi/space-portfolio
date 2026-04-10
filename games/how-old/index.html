@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Old Are You Really?</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: #0f0f0f;
+            color: #f0f0f0;
+            min-height: 100vh;
+        }
+
+        /* ── INTRO ── */
+        #intro {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        #intro h1 {
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin-bottom: 0.75rem;
+        }
+
+        #intro p {
+            font-size: 1.15rem;
+            color: #888;
+            margin-bottom: 2.5rem;
+            max-width: 380px;
+        }
+
+        .input-row {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .date-selects {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .date-selects select {
+            font-size: 1.1rem;
+            font-family: inherit;
+            font-weight: 600;
+            padding: 0.7rem 0.8rem;
+            border: 2.5px solid #333;
+            border-radius: 14px;
+            outline: none;
+            cursor: pointer;
+            background: #1a1a1a;
+            color: #f0f0f0;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23aaa' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.65rem center;
+            padding-right: 2rem;
+            transition: border-color 0.15s;
+        }
+
+        .date-selects select:focus {
+            border-color: #666;
+        }
+
+        #sel-month { min-width: 130px; }
+        #sel-day   { min-width: 72px; }
+        #sel-year  { min-width: 90px; }
+
+        #go-btn {
+            font-size: 1.1rem;
+            font-family: inherit;
+            font-weight: 700;
+            padding: 0.7rem 2.2rem;
+            background: #f0f0f0;
+            color: #111;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: transform 0.1s ease, background 0.15s;
+        }
+
+        #go-btn:hover {
+            background: #ccc;
+            transform: scale(1.03);
+        }
+
+        #go-btn:active {
+            transform: scale(0.98);
+        }
+
+        .error {
+            color: #e03131;
+            font-size: 0.9rem;
+            min-height: 1.2em;
+        }
+
+        /* ── RESULTS ── */
+        #results {
+            display: none;
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 4rem 1.5rem 5rem;
+        }
+
+        #results.visible {
+            display: block;
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .results-header h2 {
+            font-size: clamp(1.6rem, 5vw, 2.4rem);
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+
+        .results-header .born-date {
+            color: #666;
+            margin-top: 0.4rem;
+            font-size: 1rem;
+        }
+
+        /* Stat cards */
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            padding: 1.25rem 1.5rem;
+            border-radius: 18px;
+            margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateY(18px);
+            transition: opacity 0.45s ease, transform 0.45s ease;
+        }
+
+        .stat-card.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stat-emoji {
+            font-size: 2.2rem;
+            flex-shrink: 0;
+            width: 2.5rem;
+            text-align: center;
+        }
+
+        .stat-body {
+            flex: 1;
+        }
+
+        .stat-number {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -0.5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 0.2rem;
+        }
+
+        .stat-note {
+            font-size: 0.78rem;
+            color: #666;
+            margin-top: 0.3rem;
+        }
+
+        /* Card color palette (dark) */
+        .c0  { background: #1e1520; }
+        .c1  { background: #1e1c10; }
+        .c2  { background: #0f1e1a; }
+        .c3  { background: #101820; }
+        .c4  { background: #16101e; }
+        .c5  { background: #1e1710; }
+        .c6  { background: #101e12; }
+        .c7  { background: #101820; }
+        .c8  { background: #181818; }
+        .c9  { background: #1e1c10; }
+        .c10 { background: #1e1608; }
+        .c11 { background: #0f1e1a; }
+        .c12 { background: #16101e; }
+        .c13 { background: #1e1520; }
+        .c14 { background: #101820; }
+        .c15 { background: #1e1c10; }
+        .c16 { background: #0f1e1a; }
+        .c17 { background: #1e1520; }
+        .c18 { background: #16101e; }
+
+        /* Restart button */
+        #restart-btn {
+            display: block;
+            margin: 2.5rem auto 0;
+            font-size: 1rem;
+            font-family: inherit;
+            font-weight: 600;
+            padding: 0.65rem 1.8rem;
+            background: transparent;
+            color: #f0f0f0;
+            border: 2.5px solid #333;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+        }
+
+        #restart-btn:hover {
+            background: #1a1a1a;
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body>
+
+<!-- INTRO -->
+<div id="intro">
+    <h1>How Old Are You Really?</h1>
+    <p>Enter your birthday and discover what your age actually means.</p>
+    <div class="input-row">
+        <div class="date-selects">
+            <select id="sel-day">
+                <option value="">Day</option>
+            </select>
+            <select id="sel-month">
+                <option value="">Month</option>
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+            <select id="sel-year">
+                <option value="">Year</option>
+            </select>
+        </div>
+        <button id="go-btn" onclick="calculate()">Find Out</button>
+        <div class="error" id="error-msg"></div>
+    </div>
+</div>
+
+<!-- RESULTS -->
+<div id="results">
+    <div class="results-header">
+        <h2 id="age-headline"></h2>
+        <div class="born-date" id="born-date"></div>
+    </div>
+    <div id="stats"></div>
+    <button id="restart-btn" onclick="restart()">Try Another Date</button>
+</div>
+
+<script>
+    // Populate year dropdown (current year down to 1900)
+    const currentYear = new Date().getFullYear();
+    const selYear = document.getElementById('sel-year');
+    for (let y = currentYear; y >= 1900; y--) {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y;
+        selYear.appendChild(opt);
+    }
+
+    // Populate / refresh day dropdown based on selected month+year
+    function refreshDays() {
+        const month = parseInt(document.getElementById('sel-month').value) || 0;
+        const year  = parseInt(document.getElementById('sel-year').value)  || 0;
+        const selDay = document.getElementById('sel-day');
+        const prevDay = selDay.value;
+        const daysInMonth = (month && year) ? new Date(year, month, 0).getDate() : 31;
+        selDay.innerHTML = '<option value="">Day</option>';
+        for (let d = 1; d <= daysInMonth; d++) {
+            const opt = document.createElement('option');
+            opt.value = d;
+            opt.textContent = d;
+            selDay.appendChild(opt);
+        }
+        if (prevDay && parseInt(prevDay) <= daysInMonth) selDay.value = prevDay;
+    }
+
+    document.getElementById('sel-month').addEventListener('change', refreshDays);
+    document.getElementById('sel-year').addEventListener('change', refreshDays);
+    refreshDays();
+
+    const STAT_DEFS = [
+        {
+            emoji: '⏱️', label: 'seconds alive', decimal: false,
+            compute: (s) => s.sec,
+            note: (s) => `in that time, light has traveled ${s.years.toFixed(1)} light-year${s.years.toFixed(1) !== '1.0' ? 's' : ''}`,
+        },
+        {
+            emoji: '❤️', label: 'heartbeats (avg. 70 bpm)', decimal: false,
+            compute: (s) => s.sec * 1.167,
+            note: (s) => `a heart beats ~2.5 billion times in a lifetime · you're ${Math.min((s.sec * 1.167 / 2500000000 * 100), 100).toFixed(1)}% of the way there`,
+        },
+        {
+            emoji: '💨', label: 'breaths taken (avg. 16/min)', decimal: false,
+            compute: (s) => s.min * 16,
+            note: (s) => `enough air to fill ${(s.min * 16 * 0.5 / 2500000).toFixed(1)} Olympic swimming pool${(s.min * 16 * 0.5 / 2500000).toFixed(1) !== '1.0' ? 's' : ''}`,
+        },
+        {
+            emoji: '🌅', label: 'days alive', decimal: false,
+            compute: (s) => s.days,
+            note: (s) => `that's ${Math.floor(s.days / 7).toLocaleString()} weekend${Math.floor(s.days / 7) !== 1 ? 's' : ''}`,
+        },
+        {
+            emoji: '🌕', label: 'full moons witnessed', decimal: false,
+            compute: (s) => s.days / 29.53,
+            note: () => `each cycle is exactly 29.53 days, the origin of the word "month"`,
+        },
+        {
+            emoji: '😴', label: 'hours spent sleeping (avg. 8/day)', decimal: false,
+            compute: (s) => s.days * 8,
+            note: (s) => `equivalent to ${(s.days * 8 / 8766).toFixed(1)} year${(s.days * 8 / 8766).toFixed(1) !== '1.0' ? 's' : ''} spent asleep`,
+        },
+        {
+            emoji: '🌍', label: 'miles traveled around the sun', decimal: false,
+            compute: (s) => s.years * 584000000,
+            note: (s) => `Earth moves at 66,600 mph · ${Math.floor(s.years)} full lap${Math.floor(s.years) !== 1 ? 's' : ''} around the sun`,
+        },
+        {
+            emoji: '🔴', label: 'years old on Mars', decimal: true, decimals: 1,
+            compute: (s) => s.years / 1.88,
+            note: () => `a Martian day is 24h 39m, nearly identical to Earth's`,
+        },
+        {
+            emoji: '🪐', label: 'years old on Jupiter', decimal: true, decimals: 2,
+            compute: (s) => s.years / 11.86,
+            note: () => `one Jupiter year = 4,333 Earth days`,
+        },
+        {
+            emoji: '🎂', label: 'birthday candles blown out', decimal: false,
+            compute: (s) => { const age = Math.floor(s.years); return age * (age + 1) / 2; },
+            note: (s) => { const age = Math.floor(s.years); return `1 + 2 + 3 ... + ${age} (${age} candles on your last cake)`; },
+        },
+        {
+            emoji: '💇', label: 'cm of hair grown (avg. 15cm/year)', decimal: false,
+            compute: (s) => s.years * 15,
+            note: (s) => `if you'd never cut it, your hair would be ${(s.years * 15 / 100).toFixed(1)} metres long`,
+        },
+        {
+            emoji: '🎬', label: 'Lord of the Rings watchings (extended)', decimal: true, decimals: 1,
+            compute: (s) => s.min / 726,
+            note: () => `Fellowship + Two Towers + Return of the King, 726 minutes back to back`,
+        },
+        {
+            emoji: '🛸', label: 'times the ISS has orbited Earth', decimal: false,
+            compute: (s) => s.min / 92,
+            note: () => `the ISS travels at 17,500 mph and circles Earth every 92 minutes`,
+        },
+        {
+            emoji: '📅', label: 'Mondays survived', decimal: false,
+            compute: (s) => Math.floor(s.days / 7),
+            note: () => `hang in there`,
+        },
+        {
+            emoji: '💧', label: 'glasses of water (avg. 8/day)', decimal: false,
+            compute: (s) => s.days * 8,
+            note: (s) => `enough to fill ${(s.days * 8 * 0.237 / 150).toFixed(0)} bathtubs`,
+        },
+        {
+            emoji: '🩸', label: 'red blood cells created', decimal: false,
+            compute: (s) => s.sec * 2400000,
+            note: () => `your bone marrow never stops. it'll create ~200 billion today alone`,
+        },
+        {
+            emoji: '🧬', label: 'new cells created', decimal: false,
+            compute: (s) => s.sec * 3800000,
+            note: () => `~86% are blood cells, the rest are gut lining, skin, and immune cells`,
+        },
+        {
+            emoji: '💉', label: 'litres of blood pumped', decimal: true, decimals: 1,
+            compute: (s) => s.min * 5,
+            note: (s) => `enough to fill ${(s.min * 5 / 2500000).toFixed(4)} Olympic swimming pools`,
+        },
+        {
+            emoji: '👁️', label: 'eye movements (saccades)', decimal: false,
+            compute: (s) => s.sec * 3,
+            note: () => `your eyes dart 3 times per second. you never notice because your brain hides the motion`,
+        },
+    ];
+
+    let liveTicker = null;
+    let currentBirthday = null;
+    let statNumEls = [];
+
+    function getUnits(birthday) {
+        const ms    = Date.now() - birthday.getTime();
+        const sec   = ms / 1000;
+        const min   = sec / 60;
+        const days  = ms / 86400000;
+        const years = days / 365.25;
+        return { sec, min, days, years };
+    }
+
+    function renderStat(el, def, units) {
+        const raw = def.compute(units);
+        el.textContent = def.decimal
+            ? raw.toFixed(def.decimals)
+            : Math.floor(raw).toLocaleString();
+    }
+
+    function startLiveTicker() {
+        if (liveTicker) cancelAnimationFrame(liveTicker);
+        function tick() {
+            const units = getUnits(currentBirthday);
+            statNumEls.forEach((el, i) => renderStat(el, STAT_DEFS[i], units));
+            liveTicker = requestAnimationFrame(tick);
+        }
+        liveTicker = requestAnimationFrame(tick);
+    }
+
+    function countUp(el, def, startUnits, duration) {
+        const t0 = performance.now();
+        function step(now) {
+            const progress = Math.min((now - t0) / duration, 1);
+            const eased    = 1 - Math.pow(1 - progress, 3);
+            const fakeUnits = {
+                sec:   startUnits.sec   * eased,
+                min:   startUnits.min   * eased,
+                days:  startUnits.days  * eased,
+                years: startUnits.years * eased,
+            };
+            renderStat(el, def, fakeUnits);
+            if (progress < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+    }
+
+    function calculate() {
+        const errEl = document.getElementById('error-msg');
+        errEl.textContent = '';
+
+        const month = parseInt(document.getElementById('sel-month').value);
+        const day   = parseInt(document.getElementById('sel-day').value);
+        const year  = parseInt(document.getElementById('sel-year').value);
+
+        if (!month || !day || !year) { errEl.textContent = 'Please select a month, day, and year.'; return; }
+
+        const birthday = new Date(year, month - 1, day);
+
+        if (birthday >= new Date()) { errEl.textContent = 'That date is in the future!'; return; }
+
+        // Stop any previous ticker
+        if (liveTicker) { cancelAnimationFrame(liveTicker); liveTicker = null; }
+        currentBirthday = birthday;
+        statNumEls = [];
+
+        const units = getUnits(birthday);
+
+        // Precise calendar age
+        let ageYears = new Date().getFullYear() - birthday.getFullYear();
+        const dm = new Date().getMonth() - birthday.getMonth();
+        if (dm < 0 || (dm === 0 && new Date().getDate() < birthday.getDate())) ageYears--;
+
+        document.getElementById('age-headline').textContent =
+            `You are ${ageYears} year${ageYears !== 1 ? 's' : ''} old.`;
+        document.getElementById('born-date').textContent =
+            birthday.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        const container = document.getElementById('stats');
+        container.innerHTML = '';
+
+        const lastDelay = 80 + (STAT_DEFS.length - 1) * 130;
+
+        STAT_DEFS.forEach((def, i) => {
+            const card   = document.createElement('div');
+            card.className = `stat-card c${i}`;
+
+            const numEl  = document.createElement('span');
+            numEl.className = 'stat-number';
+            numEl.textContent = '0';
+            statNumEls.push(numEl);
+
+            card.innerHTML = `<div class="stat-emoji">${def.emoji}</div><div class="stat-body"></div>`;
+            const body = card.querySelector('.stat-body');
+            body.appendChild(numEl);
+            body.insertAdjacentHTML('beforeend', `<div class="stat-label">${def.label}</div>`);
+            if (def.note) {
+                const noteEl = document.createElement('div');
+                noteEl.className = 'stat-note';
+                noteEl.textContent = def.note(units);
+                body.appendChild(noteEl);
+            }
+            container.appendChild(card);
+
+            setTimeout(() => {
+                card.classList.add('show');
+                countUp(numEl, def, units, 1000);
+            }, 80 + i * 130);
+        });
+
+        // Switch to live ticker after all animations finish
+        setTimeout(startLiveTicker, lastDelay + 1100);
+
+        document.getElementById('intro').style.display = 'none';
+        document.getElementById('results').classList.add('visible');
+        window.scrollTo({ top: 0 });
+    }
+
+    function restart() {
+        if (liveTicker) { cancelAnimationFrame(liveTicker); liveTicker = null; }
+        document.getElementById('intro').style.display = 'flex';
+        document.getElementById('results').classList.remove('visible');
+        document.getElementById('sel-month').value = '';
+        document.getElementById('sel-day').value   = '';
+        document.getElementById('sel-year').value  = '';
+        document.getElementById('error-msg').textContent = '';
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && document.getElementById('intro').style.display !== 'none') calculate();
+    });
+</script>
+</body>
+</html>
