@@ -59,7 +59,7 @@ export const PROJECTS = [
   {
     id: 'how-old',
     name: 'How Old Are You Really?',
-    description: 'Enter your birthday and discover what your age actually means — in heartbeats, miles around the sun, full moons, ISS orbits, and more. Numbers update live in real time.',
+    description: 'Enter your birthday and discover what your age actually means in heartbeats, miles around the sun, full moons, ISS orbits, and more. Numbers update live in real time.',
     techStack: ['HTML', 'CSS', 'JavaScript'],
     github: 'https://github.com/ELPYi',
     liveUrl: '/games/how-old',

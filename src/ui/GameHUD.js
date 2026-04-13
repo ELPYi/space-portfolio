@@ -1,8 +1,8 @@
 const MAX_HELD = 10;
 
 const STATUS_OBJECTIVES = {
-  full:       'Holds full — fly to the MOTHERSHIP to deposit',
-  depositing: 'Processing at MOTHERSHIP — cargo ship en route...',
+  full:       'Holds full. Fly to the MOTHERSHIP to deposit',
+  depositing: 'Processing at MOTHERSHIP. Cargo ship en route...',
   hasCargo:   'Fly to the MOTHERSHIP to deposit materials',
 };
 

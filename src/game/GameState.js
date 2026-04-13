@@ -6,10 +6,10 @@
  */
 
 export const PHASE_INFO = [
-  { id: 0, name: 'GATHERING',  objective: 'Collect ore & parts — deposit at the MOTHERSHIP' },
+  { id: 0, name: 'GATHERING',  objective: 'Collect ore & parts. Deposit at the MOTHERSHIP' },
   { id: 1, name: 'ESCORT',     objective: 'Defend the CARGO SHIP as it travels to the sun!' },
   { id: 2, name: 'BOSS FIGHT', objective: 'Destroy the GOLIATH! Hold [F] for special laser' },
-  { id: 3, name: 'VICTORY',    objective: 'Mission complete — the Dyson sphere is online!' },
+  { id: 3, name: 'VICTORY',    objective: 'Mission complete. The Dyson sphere is online!' },
 ];
 
 export class GameState {

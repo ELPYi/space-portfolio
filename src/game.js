@@ -605,7 +605,7 @@ if (cargoShip) {
   };
 
   cargoShip.onDestroyed = () => {
-    showWaveWarning('CARGO SHIP DESTROYED — MISSION RESET');
+    showWaveWarning('CARGO SHIP DESTROYED - MISSION RESET');
     soundManager.playAsteroidBreak();
     // Server will reset phase to 0 and broadcast game_state
   };
@@ -616,7 +616,7 @@ gameState.onPhaseChange = (phase, prevPhase) => {
   if (phase === 0) {
     // Gathering — reset/clean up from previous run
     if (prevPhase === 1) {
-      showWaveWarning('CARGO SHIP DESTROYED — MISSION RESET');
+      showWaveWarning('CARGO SHIP DESTROYED - MISSION RESET');
       soundManager.playAsteroidBreak();
     }
     gameHUD.showObjective('↓ DEPOSIT MATERIALS AT MOTHERSHIP');
@@ -651,7 +651,7 @@ gameState.onPhaseChange = (phase, prevPhase) => {
     if (cargoShip) gameHUD.updateCargoHp(cargoShip.hp, cargoShip.maxHp);
     // Start construction beam: cargo ship → dyson sphere
     if (dysonSphere && cargoShip) dysonSphere.setBeamTarget(cargoShip.group);
-    showWaveWarning('CARGO SHIP DEPARTING — DEFEND IT!');
+    showWaveWarning('CARGO SHIP DEPARTING - DEFEND IT!');
   } else if (phase === 2) {
     // Boss phase — 60s construction window while fighting Goliath
     gameHUD.hideObjective();
@@ -668,7 +668,7 @@ gameState.onPhaseChange = (phase, prevPhase) => {
     // Kill construction beam — sphere will build during the 60s boss fight
     dysonSphere?.setBeamTarget(null);
     _bossPhaseTime = 0;
-    showWaveWarning('GOLIATH INBOUND — 60s TO BUILD THE SPHERE!');
+    showWaveWarning('GOLIATH INBOUND - 60s TO BUILD THE SPHERE!');
   } else if (phase === 3) {
     // Victory
     gameHUD.hideObjective();
@@ -842,7 +842,7 @@ networkManager.onSessionCountdown = (secondsLeft) => {
 
 // ── Session end — server is about to close all connections ───────────────────
 networkManager.onSessionEnd = () => {
-  showWaveWarning('MATCH RESET — RETURNING TO BASE');
+  showWaveWarning('MATCH RESET - RETURNING TO BASE');
   soundManager.stopCombatMusic();
 };
 

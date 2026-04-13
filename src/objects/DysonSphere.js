@@ -364,7 +364,7 @@ export class DysonSphere {
     this._powerUpComplete = false;
 
     if (this._progressText) {
-      this._progressText.textContent = 'ONLINE — Full Power';
+      this._progressText.textContent = 'ONLINE - Full Power';
     }
   }
 
@@ -390,7 +390,7 @@ export class DysonSphere {
       panel.material.emissiveIntensity = 3;
     }
 
-    if (this._progressText) this._progressText.textContent = 'ONLINE — Full Power';
+    if (this._progressText) this._progressText.textContent = 'ONLINE - Full Power';
 
     this._visibleCount = this.panels.length;
 

@@ -43,7 +43,7 @@ export class ProjectCard {
     if (entered && !this.isEntered) {
       this.isEntered = true;
       this.card.classList.add('entered');
-      this.hint.textContent = 'Project opened — click canvas to resume flying';
+      this.hint.textContent = 'Project opened. Click canvas to resume flying';
     } else if (!entered && this.isEntered) {
       this.isEntered = false;
       this.card.classList.remove('entered');
